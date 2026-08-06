@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
-  res.json({ message: '✅ QueueLess API is running' });
+  res.json({ message: ' QueueLess API is running' });
 });
 
 // Routes
@@ -39,5 +39,5 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(` Server running on port ${PORT}`);
 });
