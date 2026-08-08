@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pencil, Trash2, Search, UserPlus } from 'lucide-react';
+import { Pencil, Trash2, Search, UserPlus, Eye, EyeOff } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -11,6 +11,7 @@ const EMPTY_FORM = { name: '', email: '', password: '', role: 'staff' };
 const UserForm = ({ initial, onSave, onCancel }) => {
   const isEdit = !!initial?._id;
   const [form, setForm] = useState(isEdit ? { name: initial.name, email: initial.email, role: initial.role, password: '' } : EMPTY_FORM);
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -47,7 +48,41 @@ const UserForm = ({ initial, onSave, onCancel }) => {
           {!isEdit && (
             <div className="form-group">
               <label>Password</label>
-              <input name="password" type="password" placeholder="Min 6 characters" value={form.password} onChange={handleChange} required />
+              <div style={{ position: 'relative', width: '100%' }}>
+                <input
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Min 6 characters"
+                  value={form.password}
+                  onChange={handleChange}
+                  required
+                  style={{ paddingRight: 40 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{
+                    position: 'absolute',
+                    right: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'var(--grey-text)',
+                    cursor: 'pointer',
+                    transition: 'var(--transition)',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--grey-text)'; }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
           )}
           <div className="form-group">

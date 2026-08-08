@@ -4,21 +4,30 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(() => {
-    const saved = localStorage.getItem('ql_cart');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('ql_cart');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
   });
 
   // Persist cart to localStorage on every change
   useEffect(() => {
-    localStorage.setItem('ql_cart', JSON.stringify(cart));
+    try {
+      localStorage.setItem('ql_cart', JSON.stringify(cart));
+    } catch {
+      /* ignore storage errors */
+    }
   }, [cart]);
 
   const addToCart = (item) => {
+    if (item.available === false) return;
     setCart((prev) => {
       const exists = prev.find((i) => i._id === item._id);
       if (exists) {
         return prev.map((i) =>
-          i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
+          i._id === item._id ? { ...i, quantity: Math.min(i.quantity + 1, 99) } : i
         );
       }
       return [...prev, { ...item, quantity: 1 }];
@@ -27,7 +36,7 @@ export const CartProvider = ({ children }) => {
 
   const increaseQty = (id) => {
     setCart((prev) =>
-      prev.map((i) => (i._id === id ? { ...i, quantity: i.quantity + 1 } : i))
+      prev.map((i) => (i._id === id ? { ...i, quantity: Math.min(i.quantity + 1, 99) } : i))
     );
   };
 
@@ -45,7 +54,11 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem('ql_cart');
+    try {
+      localStorage.removeItem('ql_cart');
+    } catch {
+      /* ignore */
+    }
   };
 
   const totalPrice = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);

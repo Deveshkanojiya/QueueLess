@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UtensilsCrossed } from 'lucide-react';
+import { UtensilsCrossed, Eye, EyeOff } from 'lucide-react';
 import { loginUser } from '../api/auth';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -56,16 +57,43 @@ const LoginPage = () => {
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              value={form.password}
-              onChange={handleChange}
-              required
-              autoComplete="current-password"
-            />
+            <div style={{ position: 'relative', width: '100%' }}>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={form.password}
+                onChange={handleChange}
+                required
+                autoComplete="current-password"
+                style={{ paddingRight: 40 }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'var(--grey-text)',
+                  cursor: 'pointer',
+                  transition: 'var(--transition)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--text)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--grey-text)'; }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           {error && <div className="alert alert-error" role="alert">{error}</div>}
           <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>

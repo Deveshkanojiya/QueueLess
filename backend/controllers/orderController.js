@@ -57,7 +57,7 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-// DELETE /api/orders/:id — cancel order only if Pending
+// PATCH /api/orders/:id/cancel — cancel order only if Pending
 const cancelOrder = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -75,8 +75,11 @@ const cancelOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Only Pending orders can be cancelled' });
     }
 
-    await Order.findByIdAndDelete(req.params.id);
-    res.json({ success: true, message: 'Order cancelled' });
+    order.status = 'Cancelled';
+    order.cancellationReason = 'Cancelled by student';
+    await order.save();
+
+    res.json({ success: true, message: 'Order cancelled', order });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

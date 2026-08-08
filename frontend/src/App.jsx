@@ -22,18 +22,36 @@ import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 // Misc
 import NotFoundPage from './pages/NotFoundPage';
 
-// Protect any route — must be logged in
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" replace />;
+// Helper to safely parse user from localStorage
+const getStoredUser = () => {
+  try {
+    const data = localStorage.getItem('user');
+    return data ? JSON.parse(data) : null;
+  } catch {
+    return null;
+  }
 };
 
-// Protect route by role — if not logged in go to login; if role mismatch redirect to the user's dashboard
+// Redirect logged in users away from public auth routes
+const PublicOnlyRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  const user = getStoredUser();
+
+  if (token && user) {
+    if (user.role === 'admin') return <Navigate to="/admin" replace />;
+    if (user.role === 'staff') return <Navigate to="/staff" replace />;
+    return <Navigate to="/dashboard" replace />;
+  }
+  return children;
+};
+
+// Protect route by role — if not logged in go to login; if role mismatch redirect to user's dashboard
 const RoleRoute = ({ children, roles }) => {
   const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = getStoredUser();
+
   if (!token) return <Navigate to="/login" replace />;
-  // If role not allowed, redirect them back to their correct dashboard instead of letting them access
+
   if (!roles.includes(user?.role)) {
     if (user?.role === 'admin') return <Navigate to="/admin" replace />;
     if (user?.role === 'staff') return <Navigate to="/staff" replace />;
@@ -42,9 +60,9 @@ const RoleRoute = ({ children, roles }) => {
   return children;
 };
 
-// Smart redirect: send user to their correct dashboard on login
+// Smart redirect: send user to their correct dashboard on root visit
 const SmartRedirect = () => {
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const user = getStoredUser();
   if (!user) return <Navigate to="/login" replace />;
   if (user.role === 'admin') return <Navigate to="/admin" replace />;
   if (user.role === 'staff') return <Navigate to="/staff" replace />;
@@ -56,9 +74,9 @@ function App() {
     <CartProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/* Public / Auth routes (redirects if already logged in) */}
+          <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
+          <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
 
           {/* Student routes (only students allowed) */}
           <Route path="/dashboard" element={<RoleRoute roles={['student']}><DashboardPage /></RoleRoute>} />
@@ -71,7 +89,7 @@ function App() {
           <Route path="/staff" element={<RoleRoute roles={['staff']}><StaffDashboard /></RoleRoute>} />
           <Route path="/staff/orders" element={<RoleRoute roles={['staff']}><StaffDashboard /></RoleRoute>} />
 
-          {/* Admin routes */}
+          {/* Admin routes (admin only) */}
           <Route path="/admin" element={<RoleRoute roles={['admin']}><AdminDashboard /></RoleRoute>} />
           <Route path="/admin/menu" element={<RoleRoute roles={['admin']}><AdminMenuPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute roles={['admin']}><AdminUsersPage /></RoleRoute>} />
