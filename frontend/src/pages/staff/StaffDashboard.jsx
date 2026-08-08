@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
-import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock, QrCode } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import CancellationReasonModal from '../../components/CancellationReasonModal';
+import OpenOrderModal from '../../components/OpenOrderModal';
 import { fetchStaffStats, fetchAllOrders, updateOrderStatus, verifyOrderPayment, staffCancelOrder } from '../../api/staff';
 
 const SIDEBAR_LINKS = [
@@ -117,13 +118,17 @@ const StaffDashboard = () => {
   const [activeTab, setActiveTab] = useState('Pending');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showOpenModal, setShowOpenModal] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const [statsRes, ordersRes] = await Promise.all([
         fetchStaffStats(),
-        fetchAllOrders({ status: activeTab, search }),
+        fetchAllOrders({
+          status: activeTab === 'All' ? undefined : activeTab,
+          search: search.trim() || undefined,
+        }),
       ]);
       setStats(statsRes.data.stats);
       setOrders(ordersRes.data.orders);
@@ -136,9 +141,25 @@ const StaffDashboard = () => {
 
   useEffect(() => { load(); }, [load]);
 
+  const handleOrderFound = (searchTerm, order) => {
+    if (order?.status) {
+      setActiveTab(order.status);
+    } else {
+      setActiveTab('All');
+    }
+    setSearch(searchTerm);
+  };
+
   return (
     <>
       <Navbar />
+      {showOpenModal && (
+        <OpenOrderModal
+          onClose={() => setShowOpenModal(false)}
+          onOrderFound={handleOrderFound}
+        />
+      )}
+
       <div className="dashboard-layout">
         <Sidebar links={SIDEBAR_LINKS} />
         <main className="main-content">
@@ -162,7 +183,7 @@ const StaffDashboard = () => {
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="filter-tabs" style={{ marginBottom: 0 }}>
-              {['Pending', 'Preparing', 'Completed', 'Cancelled'].map((tab) => (
+              {['Pending', 'Preparing', 'Completed', 'Cancelled', 'All'].map((tab) => (
                 <button
                   key={tab}
                   className={`filter-tab ${activeTab === tab ? 'active' : ''}`}
@@ -185,11 +206,12 @@ const StaffDashboard = () => {
             </div>
 
             <div>
-              <button className="btn btn-ghost btn-sm" style={{ border: '1px solid var(--grey-border)' }} onClick={() => {
-                const v = window.prompt('Enter token number or order ID');
-                if (v) setSearch(v.trim());
-              }}>
-                Open by Token / QR
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowOpenModal(true)}
+              >
+                <QrCode size={16} />
+                <span>Open by Token / QR</span>
               </button>
             </div>
           </div>

@@ -1324,3 +1324,134 @@ img {
   color: #B91C1C;
   border: 1px solid #FCA5A5;
 }
+
+/* ── Open Order Modal ────────────────────────────── */
+.open-order-modal-box {
+  background: #ffffff;
+  border-radius: var(--radius);
+  border: 1px solid var(--grey-border);
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+  width: 500px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlide 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .open-order-modal-box {
+    width: 90vw;
+    padding: 24px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .open-order-modal-box {
+    width: 95vw;
+    padding: 20px 16px;
+    gap: 16px;
+  }
+}
+
+.open-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--grey-border);
+  padding-bottom: 14px;
+}
+
+.open-order-header h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.open-order-mode-selector {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .open-order-mode-selector {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.mode-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  min-height: 48px;
+  border: 1.5px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: var(--transition);
+  user-select: none;
+  background: #ffffff;
+}
+
+.mode-option:hover {
+  border-color: #D1D5DB;
+  background: var(--grey-bg);
+}
+
+.mode-option.selected {
+  border-color: var(--red);
+  background: var(--red-light);
+  color: var(--red);
+  font-weight: 600;
+}
+
+.mode-option input[type="radio"] {
+  accent-color: var(--red);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.large-token-input {
+  width: 100%;
+  height: 50px;
+  min-height: 48px;
+  padding: 0 16px;
+  font-size: 1rem;
+  border: 1.5px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  color: var(--text);
+  transition: var(--transition);
+  outline: none;
+}
+
+.large-token-input:focus {
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.open-order-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.open-order-actions .btn {
+  flex: 1;
+  min-height: 46px;
+  font-size: 0.9375rem;
+}
+
