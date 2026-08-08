@@ -43,7 +43,7 @@ const AdminOrdersPage = () => {
               ))}
             </div>
 
-            <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
+            <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
               <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--grey-text)' }} />
               <input
                 className="search-input"

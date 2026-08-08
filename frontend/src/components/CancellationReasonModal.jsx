@@ -43,24 +43,13 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(17, 24, 39, 0.4)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 300,
-        animation: 'fadeIn 0.2s ease-out',
-      }}
+      className="modal-overlay"
       onClick={onCancel}
     >
       <div
-        className="card"
+        className="modal-box"
         style={{
           maxWidth: 420,
-          width: '90%',
-          animation: 'slideInRight 0.25s ease-out',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -93,6 +82,7 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
               outline: 'none',
               marginBottom: 0,
               cursor: 'pointer',
+              minHeight: 44,
             }}
           >
             <option value="">-- Select a reason --</option>
@@ -124,6 +114,7 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
                 background: '#ffffff',
                 outline: 'none',
                 marginBottom: 0,
+                minHeight: 44,
               }}
               onFocus={(e) => {
                 e.target.style.borderColor = 'var(--red)';

@@ -65,15 +65,15 @@ const OrderHistoryPage = () => {
                 <div key={order._id} className="order-card">
                   <div className="order-card-header">
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
                         <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
                         <span className={`status-badge status-${order.status}`}>{order.status}</span>
+                      </div>
                       {order.status === 'Cancelled' && order.cancellationReason && (
-                        <div style={{ marginTop: 6, fontSize: '0.8125rem', color: 'var(--grey-text)' }}>
+                        <div style={{ marginBottom: 6, fontSize: '0.8125rem', color: 'var(--grey-text)' }}>
                           <strong>Cancellation Reason:</strong> {order.cancellationReason}
                         </div>
                       )}
-                      </div>
                       <p className="order-items-list">{order.items.map(i => `${i.name} ×${i.quantity}`).join(' · ')}</p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
@@ -83,7 +83,7 @@ const OrderHistoryPage = () => {
                       </p>
                     </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--grey-border)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap', gap: 8 }}>
                     <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
                       {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                     </p>

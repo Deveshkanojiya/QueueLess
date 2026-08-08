@@ -43,10 +43,7 @@ const OrderCard = ({ order, onStatusChange }) => {
  };
 
  const handleStaffCancelConfirm = async (reason, customReason) => {
-   // reason is one of the predefined reasons or "Other"
-   // customReason is the user's custom text if they selected "Other"
    const finalReason = customReason || reason;
-    
    try {
      await staffCancelOrder(order._id, finalReason);
      setShowCancelModal(false);
@@ -66,7 +63,7 @@ const OrderCard = ({ order, onStatusChange }) => {
      )}
      <div className="order-card-header">
        <div>
-         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
            <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
            <StatusBadge status={order.status} />
          </div>
@@ -84,7 +81,7 @@ const OrderCard = ({ order, onStatusChange }) => {
          </p>
        </div>
      </div>
-     <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)' }}>
+     <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap' }}>
        {order.status === 'Pending' && (
          <button className="btn btn-primary btn-sm" onClick={() => handleUpdate('Preparing')} disabled={loading}>
            <ChefHat size={14} />
@@ -98,14 +95,12 @@ const OrderCard = ({ order, onStatusChange }) => {
          </button>
        )}
 
-       {/* Payment controls for staff */}
        {order.paymentStatus && order.paymentStatus !== 'Paid' && (
-         <button className="btn btn-secondary btn-sm" onClick={handleVerifyPayment} disabled={loading}>
+         <button className="btn btn-ghost btn-sm" onClick={handleVerifyPayment} disabled={loading} style={{ border: '1px solid var(--grey-border)' }}>
            {loading ? 'Processing...' : 'Verify Payment'}
          </button>
        )}
 
-       {/* Allow staff to cancel with reason modal */}
        {order.status !== 'Cancelled' && (
          <button className="btn btn-danger btn-sm" onClick={() => setShowCancelModal(true)} disabled={loading}>
            {loading ? 'Processing...' : 'Cancel Order'}
@@ -178,7 +173,7 @@ const StaffDashboard = () => {
               ))}
             </div>
 
-            <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
+            <div style={{ position: 'relative', flex: '1 1 200px', minWidth: 0 }}>
               <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--grey-text)' }} />
               <input
                 className="search-input"
@@ -190,8 +185,8 @@ const StaffDashboard = () => {
             </div>
 
             <div>
-              <button className="btn btn-ghost btn-sm" onClick={() => {
-                const v = window.prompt('Enter token number or order ID (paste order id or token)');
+              <button className="btn btn-ghost btn-sm" style={{ border: '1px solid var(--grey-border)' }} onClick={() => {
+                const v = window.prompt('Enter token number or order ID');
                 if (v) setSearch(v.trim());
               }}>
                 Open by Token / QR

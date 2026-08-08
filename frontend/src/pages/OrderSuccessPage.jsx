@@ -21,7 +21,6 @@ const OrderSuccessPage = () => {
     setLoading(true);
     try {
       await confirmPayment(order._id);
-      // simple feedback and go to orders
       alert('Marked as paid (awaiting staff verification)');
     } catch (err) {
       alert(err.response?.data?.message || 'Could not mark payment');
@@ -58,7 +57,7 @@ const OrderSuccessPage = () => {
               <CheckCircle size={44} />
             </div>
 
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: 'clamp(1.35rem, 5vw, 1.75rem)', fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.02em' }}>
               Order Placed Successfully!
             </h1>
             <p style={{ color: 'var(--grey-text)', fontSize: '0.9rem', marginTop: -6 }}>
@@ -81,13 +80,13 @@ const OrderSuccessPage = () => {
               <div className="qr-box">
                 <img src={order.paymentMethod === 'Canteen QR' ? (canteenQr || order.qrCode) : order.qrCode} alt="QR Code" />
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', fontFamily: 'monospace' }}>
+              <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 Order ID: {order._id}
               </p>
 
               {order.paymentMethod === 'Canteen QR' && (
                 <div style={{ marginTop: 10 }}>
-                  <button className="btn btn-primary" onClick={handleIHavePaid} disabled={loading}>
+                  <button className="btn btn-primary" onClick={handleIHavePaid} disabled={loading} style={{ width: '100%' }}>
                     {loading ? 'Marking...' : 'I Have Paid'}
                   </button>
                 </div>
@@ -115,14 +114,14 @@ const OrderSuccessPage = () => {
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: 12, marginTop: 8, width: '100%', justifyContent: 'center' }}>
-              <Link to="/orders" style={{ flex: 1 }}>
+            <div style={{ display: 'flex', gap: 12, marginTop: 8, width: '100%', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/orders" style={{ flex: '1 1 140px' }}>
                 <button className="btn btn-outline" style={{ width: '100%' }}>
                   <ShoppingBag size={16} />
                   My Orders
                 </button>
               </Link>
-              <Link to="/menu" style={{ flex: 1 }}>
+              <Link to="/menu" style={{ flex: '1 1 140px' }}>
                 <button className="btn btn-primary" style={{ width: '100%' }}>
                   Order More
                 </button>

@@ -41,7 +41,7 @@ const MenuPage = () => {
               <h1 className="page-title" style={{ marginBottom: 4 }}>Canteen Menu</h1>
               <p style={{ color: 'var(--grey-text)', fontSize: '0.875rem' }}>Freshly prepared food items available today</p>
             </div>
-            <div style={{ position: 'relative', minWidth: 260, flex: '1', maxWidth: 400 }}>
+            <div style={{ position: 'relative', width: '100%', minWidth: 0, flex: '1 1 240px', maxWidth: 400 }}>
               <Search size={18} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--grey-text)' }} />
               <input
                 className="search-input"
