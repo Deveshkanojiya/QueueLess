@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Download, Eye, QrCode, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ConfirmDialog from '../components/ConfirmDialog';
+import ViewQrModal from '../components/ViewQrModal';
 import { fetchMyOrders, cancelOrder } from '../api/orders';
 
 const OrderHistoryPage = () => {
@@ -9,6 +11,7 @@ const OrderHistoryPage = () => {
   const [loading, setLoading] = useState(true);
   const [cancellingId, setCancellingId] = useState(null);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
+  const [viewQrOrder, setViewQrOrder] = useState(null);
 
   const loadOrders = () => {
     fetchMyOrders()
@@ -34,6 +37,16 @@ const OrderHistoryPage = () => {
     }
   };
 
+  const handleDownloadQr = (qrDataUrl, tokenNumber) => {
+    if (!qrDataUrl) return;
+    const link = document.createElement('a');
+    link.href = qrDataUrl;
+    link.download = `QueueLess-Token-${tokenNumber}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
       <Navbar />
@@ -44,6 +57,14 @@ const OrderHistoryPage = () => {
           onCancel={() => setConfirmCancelId(null)}
         />
       )}
+      {viewQrOrder && (
+        <ViewQrModal
+          order={viewQrOrder}
+          onClose={() => setViewQrOrder(null)}
+          onDownload={handleDownloadQr}
+        />
+      )}
+
       <div className="page">
         <div className="container" style={{ maxWidth: 720 }}>
           <h1 className="page-title">My Orders</h1>
@@ -61,44 +82,85 @@ const OrderHistoryPage = () => {
             </div>
           ) : (
             <div className="order-list">
-              {orders.map((order) => (
-                <div key={order._id} className="order-card">
-                  <div className="order-card-header">
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                        <span style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
-                        <span className={`status-badge status-${order.status}`}>{order.status}</span>
-                      </div>
-                      {order.status === 'Cancelled' && order.cancellationReason && (
-                        <div style={{ marginBottom: 6, fontSize: '0.8125rem', color: 'var(--grey-text)' }}>
-                          <strong>Cancellation Reason:</strong> {order.cancellationReason}
+              {orders.map((order) => {
+                const isActive = order.status !== 'Completed' && order.status !== 'Cancelled';
+                return (
+                  <div key={order._id} className="order-card">
+                    {/* Header Details */}
+                    <div className="order-card-header">
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
+                          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
+                          <span className={`status-badge status-${order.status}`}>{order.status}</span>
                         </div>
-                      )}
-                      <p className="order-items-list">{order.items.map(i => `${i.name} ×${i.quantity}`).join(' · ')}</p>
+                        <p className="order-items-list">{order.items.map(i => `${i.name} ×${i.quantity}`).join(' · ')}</p>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--red)' }}>₹{order.totalPrice}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', marginTop: 2 }}>
+                          {order.paymentMethod} {order.paymentStatus ? `· ${order.paymentStatus}` : ''}
+                        </p>
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <p style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--red)' }}>₹{order.totalPrice}</p>
-                      <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', marginTop: 2 }}>
-                        {order.paymentMethod} {order.paymentStatus ? `· ${order.paymentStatus}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap', gap: 8 }}>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
-                      {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
-                    </p>
-                    {order.status === 'Pending' && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => setConfirmCancelId(order._id)}
-                        disabled={cancellingId === order._id}
-                      >
-                        {cancellingId === order._id ? 'Cancelling...' : 'Cancel Order'}
-                      </button>
+
+                    {/* QR Code Section for Active Orders (Pending, Accepted, Preparing, Ready) */}
+                    {isActive && order.qrCode && (
+                      <div className="order-qr-container">
+                        <div className="order-qr-box">
+                          <img src={order.qrCode} alt={`QR Code for Token #${order.tokenNumber}`} />
+                        </div>
+                        <div className="order-qr-actions">
+                          <button
+                            className="btn btn-outline btn-sm"
+                            onClick={() => handleDownloadQr(order.qrCode, order.tokenNumber)}
+                          >
+                            <Download size={14} />
+                            <span>Download QR</span>
+                          </button>
+                          <button
+                            className="btn btn-primary btn-sm"
+                            onClick={() => setViewQrOrder(order)}
+                          >
+                            <Eye size={14} />
+                            <span>View Full QR</span>
+                          </button>
+                        </div>
+                      </div>
                     )}
+
+                    {/* Completed Order State */}
+                    {order.status === 'Completed' && (
+                      <div className="order-collected-badge">
+                        <CheckCircle2 size={16} />
+                        <span>Order Collected</span>
+                      </div>
+                    )}
+
+                    {/* Cancelled Order State */}
+                    {order.status === 'Cancelled' && (
+                      <div style={{ marginTop: 10, padding: '10px 12px', background: '#FEF2F2', border: '1px solid #FECACA', borderRadius: 'var(--radius-sm)', fontSize: '0.8125rem', color: '#991B1B' }}>
+                        <strong>Cancellation Reason:</strong> {order.cancellationReason || 'Cancelled by user or staff'}
+                      </div>
+                    )}
+
+                    {/* Card Footer */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap', gap: 8 }}>
+                      <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
+                        {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                      {order.status === 'Pending' && (
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => setConfirmCancelId(order._id)}
+                          disabled={cancellingId === order._id}
+                        >
+                          {cancellingId === order._id ? 'Cancelling...' : 'Cancel Order'}
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

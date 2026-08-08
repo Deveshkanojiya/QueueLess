@@ -1455,3 +1455,139 @@ img {
   font-size: 0.9375rem;
 }
 
+/* ── Order History QR Container & Modal ─────────── */
+.order-qr-container {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--grey-bg);
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .order-qr-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
+.order-qr-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 6px;
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.order-qr-box img {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+}
+
+.order-qr-actions {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 480px) {
+  .order-qr-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  .order-qr-actions .btn {
+    width: 100%;
+  }
+}
+
+.order-collected-badge {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #BBF7D0;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.view-qr-modal-box {
+  background: #ffffff;
+  border-radius: var(--radius);
+  border: 1px solid var(--grey-border);
+  box-shadow: var(--shadow-lg);
+  padding: 24px;
+  width: 440px;
+  max-width: 92vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modalSlide 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .view-qr-modal-box {
+    padding: 20px 16px;
+    width: 95vw;
+  }
+}
+
+.view-qr-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--grey-border);
+  padding-bottom: 12px;
+}
+
+.full-qr-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  padding: 12px;
+  border: 1px solid var(--grey-border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  margin: 0 auto;
+}
+
+.full-qr-box img {
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.view-qr-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .view-qr-actions {
+    flex-direction: column;
+  }
+}
+
+
