@@ -198,6 +198,7 @@ const Navbar = ({ onCartOpen }) => {
                   <span>Orders</span>
                 </Link>
               </>
+            )}
             {user && (
               <Link
                 to="/profile"
