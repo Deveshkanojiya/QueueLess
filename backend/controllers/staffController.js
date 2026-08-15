@@ -32,7 +32,7 @@ const getAllOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const allowed = ['Pending', 'Preparing', 'Completed', 'Cancelled'];
+    const allowed = ['Pending', 'Accepted', 'Preparing', 'Ready', 'Ready for Pickup', 'Completed', 'Cancelled'];
 
     if (!allowed.includes(status)) {
       return res.status(400).json({ success: false, message: 'Invalid status' });
@@ -104,7 +104,6 @@ const staffCancelOrder = async (req, res) => {
   }
 };
 
-
 // GET /api/staff/stats — summary counts for dashboard cards
 const getStats = async (req, res) => {
   try {
@@ -113,7 +112,7 @@ const getStats = async (req, res) => {
 
     const [pending, preparing, completedToday] = await Promise.all([
       Order.countDocuments({ status: 'Pending' }),
-      Order.countDocuments({ status: 'Preparing' }),
+      Order.countDocuments({ status: { $in: ['Preparing', 'Accepted'] } }),
       Order.countDocuments({ status: 'Completed', createdAt: { $gte: startOfDay } }),
     ]);
 

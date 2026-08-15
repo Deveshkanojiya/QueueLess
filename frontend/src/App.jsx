@@ -1,6 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 
+// Landing Page
+import LandingPage from './pages/LandingPage';
+
 // Student pages
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -60,13 +63,17 @@ const RoleRoute = ({ children, roles }) => {
   return children;
 };
 
-// Smart redirect: send user to their correct dashboard on root visit
-const SmartRedirect = () => {
+// Root route handler: if authenticated, redirect to role dashboard; otherwise render Landing Page
+const RootRoute = () => {
+  const token = localStorage.getItem('token');
   const user = getStoredUser();
-  if (!user) return <Navigate to="/login" replace />;
-  if (user.role === 'admin') return <Navigate to="/admin" replace />;
-  if (user.role === 'staff') return <Navigate to="/staff" replace />;
-  return <Navigate to="/dashboard" replace />;
+
+  if (token && user) {
+    if (user.role === 'admin') return <Navigate to="/admin" replace />;
+    if (user.role === 'staff') return <Navigate to="/staff" replace />;
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <LandingPage />;
 };
 
 function App() {
@@ -74,6 +81,9 @@ function App() {
     <CartProvider>
       <BrowserRouter>
         <Routes>
+          {/* Landing Page at Root Route */}
+          <Route path="/" element={<RootRoute />} />
+
           {/* Public / Auth routes (redirects if already logged in) */}
           <Route path="/login" element={<PublicOnlyRoute><LoginPage /></PublicOnlyRoute>} />
           <Route path="/register" element={<PublicOnlyRoute><RegisterPage /></PublicOnlyRoute>} />
@@ -95,8 +105,7 @@ function App() {
           <Route path="/admin/users" element={<RoleRoute roles={['admin']}><AdminUsersPage /></RoleRoute>} />
           <Route path="/admin/orders" element={<RoleRoute roles={['admin']}><AdminOrdersPage /></RoleRoute>} />
 
-          {/* Smart root redirect */}
-          <Route path="/" element={<SmartRedirect />} />
+          {/* 404 Catch-All */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>

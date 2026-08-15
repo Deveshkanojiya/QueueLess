@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema(
     // track overall order status (kitchen flow)
     status: {
       type: String,
-      enum: ['Pending', 'Preparing', 'Completed', 'Cancelled'],
+      enum: ['Pending', 'Accepted', 'Preparing', 'Ready', 'Ready for Pickup', 'Completed', 'Cancelled'],
       default: 'Pending',
     },
     // track payment lifecycle separately to avoid overloading `status`

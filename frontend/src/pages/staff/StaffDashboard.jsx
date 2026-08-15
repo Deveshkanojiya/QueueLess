@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock, QrCode } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock, QrCode, Check } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import CancellationReasonModal from '../../components/CancellationReasonModal';
@@ -12,104 +12,123 @@ const SIDEBAR_LINKS = [
 ];
 
 const StatusBadge = ({ status }) => (
-  <span className={`status-badge status-${status}`}>{status}</span>
+  <span className={`status-badge status-${status.replace(/\s+/g, '')}`}>{status}</span>
 );
 
 const OrderCard = ({ order, onStatusChange }) => {
- const [loading, setLoading] = useState(false);
- const [showCancelModal, setShowCancelModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
- const handleUpdate = async (newStatus) => {
-   setLoading(true);
-   try {
-     await updateOrderStatus(order._id, newStatus);
-     onStatusChange();
-   } catch {
-     alert('Failed to update status');
-   } finally {
-     setLoading(false);
-   }
- };
+  const handleUpdate = async (newStatus) => {
+    setLoading(true);
+    try {
+      await updateOrderStatus(order._id, newStatus);
+      onStatusChange();
+    } catch {
+      alert('Failed to update status');
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const handleVerifyPayment = async () => {
-   setLoading(true);
-   try {
-     await verifyOrderPayment(order._id);
-     onStatusChange();
-   } catch (err) {
-     alert('Failed to verify payment');
-   } finally {
-     setLoading(false);
-   }
- };
+  const handleVerifyPayment = async () => {
+    setLoading(true);
+    try {
+      await verifyOrderPayment(order._id);
+      onStatusChange();
+    } catch {
+      alert('Failed to verify payment');
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const handleStaffCancelConfirm = async (reason, customReason) => {
-   const finalReason = customReason || reason;
-   try {
-     await staffCancelOrder(order._id, finalReason);
-     setShowCancelModal(false);
-     onStatusChange();
-   } catch (err) {
-     alert('Failed to cancel order');
-   }
- };
+  const handleStaffCancelConfirm = async (reason, customReason) => {
+    const finalReason = customReason || reason;
+    try {
+      await staffCancelOrder(order._id, finalReason);
+      setShowCancelModal(false);
+      onStatusChange();
+    } catch {
+      alert('Failed to cancel order');
+    }
+  };
 
- return (
-   <div className="order-card">
-     {showCancelModal && (
-       <CancellationReasonModal
-         onConfirm={handleStaffCancelConfirm}
-         onCancel={() => setShowCancelModal(false)}
-       />
-     )}
-     <div className="order-card-header">
-       <div>
-         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
-           <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
-           <StatusBadge status={order.status} />
-         </div>
-         <p style={{ fontSize: '0.8125rem', color: 'var(--grey-text)' }}>
-           <strong>{order.student?.name}</strong> · {order.paymentMethod} {order.paymentStatus ? `· ${order.paymentStatus}` : ''}
-         </p>
-         <p className="order-items-list" style={{ marginTop: 6, fontSize: '0.875rem' }}>
-           {order.items.map((i) => `${i.name} ×${i.quantity}`).join(' · ')}
-         </p>
-       </div>
-       <div style={{ textAlign: 'right' }}>
-         <p style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>₹{order.totalPrice}</p>
-         <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', marginTop: 4 }}>
-           {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-         </p>
-       </div>
-     </div>
-     <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap' }}>
-       {order.status === 'Pending' && (
-         <button className="btn btn-primary btn-sm" onClick={() => handleUpdate('Preparing')} disabled={loading}>
-           <ChefHat size={14} />
-           {loading ? 'Updating...' : 'Start Preparing'}
-         </button>
-       )}
-       {order.status === 'Preparing' && (
-         <button className="btn btn-primary btn-sm" style={{ background: 'var(--success)' }} onClick={() => handleUpdate('Completed')} disabled={loading}>
-           <CheckCircle2 size={14} />
-           {loading ? 'Updating...' : 'Mark Completed'}
-         </button>
-       )}
+  return (
+    <div className="order-card">
+      {showCancelModal && (
+        <CancellationReasonModal
+          onConfirm={handleStaffCancelConfirm}
+          onCancel={() => setShowCancelModal(false)}
+        />
+      )}
+      <div className="order-card-header">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--text)' }}>Token #{order.tokenNumber}</span>
+            <StatusBadge status={order.status} />
+          </div>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--grey-text)' }}>
+            <strong>{order.student?.name}</strong> · {order.paymentMethod} {order.paymentStatus ? `· ${order.paymentStatus}` : ''}
+          </p>
+          <p className="order-items-list" style={{ marginTop: 6, fontSize: '0.875rem' }}>
+            {order.items.map((i) => `${i.name} ×${i.quantity}`).join(' · ')}
+          </p>
+        </div>
+        <div style={{ textAlign: 'right' }}>
+          <p style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>₹{order.totalPrice}</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', marginTop: 4 }}>
+            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </p>
+        </div>
+      </div>
 
-       {order.paymentStatus && order.paymentStatus !== 'Paid' && (
-         <button className="btn btn-ghost btn-sm" onClick={handleVerifyPayment} disabled={loading} style={{ border: '1px solid var(--grey-border)' }}>
-           {loading ? 'Processing...' : 'Verify Payment'}
-         </button>
-       )}
+      <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap' }}>
+        {order.status === 'Pending' && (
+          <>
+            <button className="btn btn-outline btn-sm" onClick={() => handleUpdate('Accepted')} disabled={loading}>
+              <Check size={14} />
+              {loading ? 'Updating...' : 'Accept Order'}
+            </button>
+            <button className="btn btn-primary btn-sm" onClick={() => handleUpdate('Preparing')} disabled={loading}>
+              <ChefHat size={14} />
+              {loading ? 'Updating...' : 'Start Preparing'}
+            </button>
+          </>
+        )}
+        {order.status === 'Accepted' && (
+          <button className="btn btn-primary btn-sm" onClick={() => handleUpdate('Preparing')} disabled={loading}>
+            <ChefHat size={14} />
+            {loading ? 'Updating...' : 'Start Preparing'}
+          </button>
+        )}
+        {order.status === 'Preparing' && (
+          <button className="btn btn-primary btn-sm" style={{ background: '#059669', borderColor: '#059669' }} onClick={() => handleUpdate('Ready for Pickup')} disabled={loading}>
+            <CheckCircle2 size={14} />
+            {loading ? 'Updating...' : 'Mark Ready for Pickup'}
+          </button>
+        )}
+        {(order.status === 'Ready' || order.status === 'Ready for Pickup') && (
+          <button className="btn btn-primary btn-sm" style={{ background: 'var(--success)' }} onClick={() => handleUpdate('Completed')} disabled={loading}>
+            <CheckCircle2 size={14} />
+            {loading ? 'Updating...' : 'Mark Completed (Collected)'}
+          </button>
+        )}
 
-       {order.status !== 'Cancelled' && (
-         <button className="btn btn-danger btn-sm" onClick={() => setShowCancelModal(true)} disabled={loading}>
-           {loading ? 'Processing...' : 'Cancel Order'}
-         </button>
-       )}
-     </div>
-   </div>
- );
+        {order.paymentStatus && order.paymentStatus !== 'Paid' && (
+          <button className="btn btn-ghost btn-sm" onClick={handleVerifyPayment} disabled={loading} style={{ border: '1px solid var(--grey-border)' }}>
+            {loading ? 'Processing...' : 'Verify Payment'}
+          </button>
+        )}
+
+        {order.status !== 'Cancelled' && order.status !== 'Completed' && (
+          <button className="btn btn-danger btn-sm" onClick={() => setShowCancelModal(true)} disabled={loading}>
+            {loading ? 'Processing...' : 'Cancel Order'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const StaffDashboard = () => {
@@ -183,7 +202,7 @@ const StaffDashboard = () => {
 
           <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="filter-tabs" style={{ marginBottom: 0 }}>
-              {['Pending', 'Preparing', 'Completed', 'Cancelled', 'All'].map((tab) => (
+              {['Pending', 'Accepted', 'Preparing', 'Ready for Pickup', 'Completed', 'Cancelled', 'All'].map((tab) => (
                 <button
                   key={tab}
                   className={`filter-tab ${activeTab === tab ? 'active' : ''}`}
