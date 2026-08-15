@@ -5,6 +5,40 @@ import Sidebar from '../../components/Sidebar';
 import { ADMIN_LINKS } from './AdminDashboard';
 import { fetchAdminOrders } from '../../api/admin';
 
+const OrdersTableSkeleton = () => (
+  <div className="admin-table-wrap">
+    <table className="admin-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Student Details</th>
+          <th>Ordered Items</th>
+          <th>Total Price</th>
+          <th>Payment</th>
+          <th>Status</th>
+          <th>Date & Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <tr key={idx}>
+            <td><div className="skeleton-line" style={{ width: '40%', height: 16 }} /></td>
+            <td>
+              <div className="skeleton-line" style={{ width: '60%', height: 16 }} />
+              <div className="skeleton-line" style={{ width: '85%', height: 12, marginTop: 4 }} />
+            </td>
+            <td><div className="skeleton-line" style={{ width: '90%', height: 14 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '30%', height: 16 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '50%', height: 14 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '40%', height: 20, borderRadius: 'var(--radius-full)' }} /></td>
+            <td><div className="skeleton-line" style={{ width: '60%', height: 12 }} /></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +90,7 @@ const AdminOrdersPage = () => {
           </div>
 
           {loading ? (
-            <div className="loading-box"><div className="spinner" /></div>
+            <OrdersTableSkeleton />
           ) : orders.length === 0 ? (
             <div className="empty-state">
               <p>📋</p>

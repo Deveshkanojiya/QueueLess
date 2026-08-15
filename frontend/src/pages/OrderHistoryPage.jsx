@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import ConfirmDialog from '../components/ConfirmDialog';
 import ViewQrModal from '../components/ViewQrModal';
 import { fetchMyOrders, cancelOrder } from '../api/orders';
+import OrderDetailsModal, { getEstimatedWaitDisplay } from '../components/OrderDetailsModal';
 
 // Stage index mapping for live status tracking
 const STATUS_STAGES = {
@@ -16,26 +17,7 @@ const STATUS_STAGES = {
   Completed: 5,
 };
 
-// Estimated wait time mapping
-const getWaitTimeText = (status) => {
-  switch (status) {
-    case 'Pending':
-      return '≈ 15 mins';
-    case 'Accepted':
-      return '≈ 12 mins';
-    case 'Preparing':
-      return '≈ 8 mins';
-    case 'Ready':
-    case 'Ready for Pickup':
-      return 'Ready to Collect';
-    case 'Completed':
-      return 'Collected';
-    case 'Cancelled':
-      return 'Order Cancelled';
-    default:
-      return '≈ 15 mins';
-  }
-};
+// Estimated wait time display handled by getEstimatedWaitDisplay
 
 // Component for Swiggy/Zomato style Live Progress Tracker
 const OrderProgressTracker = ({ currentStatus }) => {
@@ -96,6 +78,7 @@ const OrderHistoryPage = () => {
   const [cancellingId, setCancellingId] = useState(null);
   const [confirmCancelId, setConfirmCancelId] = useState(null);
   const [viewQrOrder, setViewQrOrder] = useState(null);
+  const [selectedDetailOrder, setSelectedDetailOrder] = useState(null);
 
   const loadOrders = useCallback((isBackground = false) => {
     if (!isBackground) setLoading(true);
@@ -173,7 +156,9 @@ const OrderHistoryPage = () => {
       <Navbar />
       {confirmCancelId && (
         <ConfirmDialog
+          title="Cancel Order"
           message="Are you sure you want to cancel this order? This action cannot be undone."
+          confirmText="Cancel Order"
           onConfirm={handleCancel}
           onCancel={() => setConfirmCancelId(null)}
         />
@@ -183,6 +168,12 @@ const OrderHistoryPage = () => {
           order={viewQrOrder}
           onClose={() => setViewQrOrder(null)}
           onDownload={handleDownloadQr}
+        />
+      )}
+      {selectedDetailOrder && (
+        <OrderDetailsModal
+          order={selectedDetailOrder}
+          onClose={() => setSelectedDetailOrder(null)}
         />
       )}
 
@@ -263,7 +254,7 @@ const OrderHistoryPage = () => {
                           </div>
                           <span className="wait-time-chip">
                             <Clock size={13} style={{ color: 'var(--red)' }} />
-                            <span>Estimated Wait: <strong>{getWaitTimeText(order.status)}</strong></span>
+                            <span>Estimated Wait: <strong>{getEstimatedWaitDisplay(order)}</strong></span>
                           </span>
                         </div>
 
@@ -342,15 +333,23 @@ const OrderHistoryPage = () => {
                           <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
                             Placed on {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                           </p>
-                          {order.status === 'Pending' && (
+                          <div style={{ display: 'flex', gap: 8 }}>
                             <button
-                              className="btn btn-danger btn-sm"
-                              onClick={() => setConfirmCancelId(order._id)}
-                              disabled={cancellingId === order._id}
+                              className="btn btn-outline btn-sm"
+                              onClick={() => setSelectedDetailOrder(order)}
                             >
-                              {cancellingId === order._id ? 'Cancelling...' : 'Cancel Order'}
+                              View Details
                             </button>
-                          )}
+                            {order.status === 'Pending' && (
+                              <button
+                                className="btn btn-danger btn-sm"
+                                onClick={() => setConfirmCancelId(order._id)}
+                                disabled={cancellingId === order._id}
+                              >
+                                {cancellingId === order._id ? 'Cancelling...' : 'Cancel Order'}
+                              </button>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
@@ -418,9 +417,17 @@ const OrderHistoryPage = () => {
                         <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
                           {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
                         </p>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--grey-text)', fontFamily: 'monospace' }}>
-                          ID: {order._id.slice(-8)}
-                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <button
+                            className="btn btn-outline btn-sm"
+                            onClick={() => setSelectedDetailOrder(order)}
+                          >
+                            View Details
+                          </button>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--grey-text)', fontFamily: 'monospace' }}>
+                            ID: {order._id.slice(-8)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}

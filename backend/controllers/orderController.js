@@ -1,5 +1,45 @@
 const Order = require('../models/Order');
+const MenuItem = require('../models/MenuItem');
 const QRCode = require('qrcode');
+
+const calculateEstimatedTime = async (items) => {
+  try {
+    const itemIds = items.map(i => i.menuItem);
+    const menuItems = await MenuItem.find({ _id: { $in: itemIds } });
+    
+    const categoryMap = {};
+    menuItems.forEach(mi => {
+      categoryMap[mi._id.toString()] = mi.category;
+    });
+
+    const categoryTimes = {
+      'Beverages': 4,
+      'Desserts': 5,
+      'Snacks': 8,
+      'Breakfast': 10,
+      'Lunch': 15
+    };
+
+    let maxBaseTime = 0;
+    let totalQuantity = 0;
+
+    for (const item of items) {
+      const category = categoryMap[item.menuItem?.toString()] || 'Snacks';
+      const baseTime = categoryTimes[category] || 8;
+      if (baseTime > maxBaseTime) {
+        maxBaseTime = baseTime;
+      }
+      totalQuantity += item.quantity || 1;
+    }
+
+    const extraQuantity = Math.max(0, totalQuantity - 1);
+    const totalEstimate = maxBaseTime + (extraQuantity * 1.5);
+    
+    return Math.round(totalEstimate);
+  } catch (error) {
+    return 10;
+  }
+};
 
 // Generate daily token: counts today's orders and adds 1
 const generateTokenNumber = async () => {
@@ -20,6 +60,7 @@ const placeOrder = async (req, res) => {
     }
 
     const tokenNumber = await generateTokenNumber();
+    const estimatedPrepTime = await calculateEstimatedTime(items);
 
     // Create order first to get MongoDB _id
     const order = await Order.create({
@@ -31,6 +72,7 @@ const placeOrder = async (req, res) => {
       // QR payment is also 'Payment Pending' until the student clicks "I Have Paid" (then "Awaiting Verification")
       paymentStatus: 'Payment Pending',
       tokenNumber,
+      estimatedPrepTime,
     });
 
     // Generate QR code from order ID

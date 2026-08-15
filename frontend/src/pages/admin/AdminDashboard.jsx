@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { LayoutDashboard, UtensilsCrossed, Users, ShoppingBag, Clock } from 'lucide-react';
+import { LayoutDashboard, UtensilsCrossed, Users, ShoppingBag, Clock, User } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import { fetchAdminStats } from '../../api/admin';
@@ -9,7 +9,20 @@ export const ADMIN_LINKS = [
   { to: '/admin/menu', label: 'Menu Items', icon: <UtensilsCrossed size={16} /> },
   { to: '/admin/users', label: 'Staff & Users', icon: <Users size={16} /> },
   { to: '/admin/orders', label: 'All Orders', icon: <ShoppingBag size={16} /> },
+  { to: '/profile', label: 'Profile', icon: <User size={16} /> },
 ];
+
+const AdminDashboardSkeleton = () => (
+  <div className="dash-grid">
+    {Array.from({ length: 5 }).map((_, idx) => (
+      <div key={idx} className="skeleton-card" style={{ height: 110 }}>
+        <div className="skeleton-line" style={{ width: '20%', height: 20, borderRadius: '50%' }} />
+        <div className="skeleton-line" style={{ width: '60%', height: 16, marginTop: 10 }} />
+        <div className="skeleton-line" style={{ width: '30%', height: 12 }} />
+      </div>
+    ))}
+  </div>
+);
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -44,7 +57,7 @@ const AdminDashboard = () => {
           </p>
 
           {loading ? (
-            <div className="loading-box"><div className="spinner" /></div>
+            <AdminDashboardSkeleton />
           ) : (
             <div className="dash-grid">
               {cards.map((c) => (

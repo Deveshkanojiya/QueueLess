@@ -23,6 +23,7 @@ import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminOrdersPage from './pages/admin/AdminOrdersPage';
 
 // Misc
+import ProfilePage from './pages/ProfilePage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Helper to safely parse user from localStorage
@@ -104,6 +105,9 @@ function App() {
           <Route path="/admin/menu" element={<RoleRoute roles={['admin']}><AdminMenuPage /></RoleRoute>} />
           <Route path="/admin/users" element={<RoleRoute roles={['admin']}><AdminUsersPage /></RoleRoute>} />
           <Route path="/admin/orders" element={<RoleRoute roles={['admin']}><AdminOrdersPage /></RoleRoute>} />
+
+          {/* Profile route for all roles */}
+          <Route path="/profile" element={<RoleRoute roles={['student', 'staff', 'admin']}><ProfilePage /></RoleRoute>} />
 
           {/* 404 Catch-All */}
           <Route path="*" element={<NotFoundPage />} />

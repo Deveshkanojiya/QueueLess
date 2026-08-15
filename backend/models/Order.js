@@ -52,6 +52,10 @@ const orderSchema = new mongoose.Schema(
     qrCode: {
       type: String, // base64 data URL
     },
+    estimatedPrepTime: {
+      type: Number,
+      default: 10,
+    },
   },
   { timestamps: true }
 );

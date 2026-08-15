@@ -828,6 +828,25 @@ img {
   padding: 3px 8px;
   border-radius: var(--radius-full);
   backdrop-filter: blur(4px);
+  z-index: 2;
+}
+
+.food-popular-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #FEF3C7;
+  color: #D97706;
+  border: 1px solid #FCD34D;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
 }
 
 .food-card-body {
@@ -2270,4 +2289,108 @@ img {
   color: var(--grey-text);
 }
 
+/* ── In-App Status Notification Banner ──────────────── */
+.status-notification-banner {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--grey-card);
+  border: 1px solid var(--grey-border);
+  border-left: 4px solid var(--red);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 90vw;
+  width: 420px;
+}
 
+.status-notification-banner.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.status-notification-emoji {
+  font-size: 1.25rem;
+}
+
+.status-notification-message {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ── Compact Stats Grid ─────────────────────────── */
+.compact-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .compact-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 390px) {
+  .compact-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.compact-stat-card {
+  background: var(--grey-card);
+  border-radius: var(--radius);
+  border: 1px solid var(--grey-border);
+  box-shadow: var(--shadow-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: var(--transition);
+}
+
+.compact-stat-card:hover {
+  box-shadow: var(--shadow);
+  border-color: #D1D5DB;
+}
+
+.compact-stat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--grey-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.compact-stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* ── Profile Layout CSS ──────────────────────────── */
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}

@@ -106,6 +106,33 @@ const UserForm = ({ initial, onSave, onCancel }) => {
   );
 };
 
+const TableSkeleton = () => (
+  <div className="admin-table-wrap">
+    <table className="admin-table">
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Email Address</th>
+          <th>Assigned Role</th>
+          <th>Date Joined</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <tr key={idx}>
+            <td><div className="skeleton-line" style={{ width: '60%', height: 16 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '80%', height: 14 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '45%', height: 20, borderRadius: 'var(--radius-full)' }} /></td>
+            <td><div className="skeleton-line" style={{ width: '50%', height: 12 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '30%', height: 24 }} /></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
 const AdminUsersPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -150,7 +177,13 @@ const AdminUsersPage = () => {
         <UserForm initial={editing} onSave={handleSave} onCancel={() => { setShowForm(false); setEditing(null); }} />
       )}
       {confirmDelete && (
-        <ConfirmDialog message="Are you sure you want to remove this user account?" onConfirm={handleDelete} onCancel={() => setConfirmDelete(null)} />
+        <ConfirmDialog 
+          title="Delete User"
+          message="Are you sure you want to remove this user account? This action cannot be undone." 
+          confirmText="Delete User"
+          onConfirm={handleDelete} 
+          onCancel={() => setConfirmDelete(null)} 
+        />
       )}
       <div className="dashboard-layout">
         <Sidebar links={ADMIN_LINKS} />
@@ -189,7 +222,7 @@ const AdminUsersPage = () => {
           </div>
 
           {loading ? (
-            <div className="loading-box"><div className="spinner" /></div>
+            <TableSkeleton />
           ) : users.length === 0 ? (
             <div className="empty-state">
               <p>👥</p>

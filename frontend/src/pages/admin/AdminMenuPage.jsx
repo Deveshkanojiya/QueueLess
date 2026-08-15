@@ -79,6 +79,36 @@ const MenuForm = ({ initial, onSave, onCancel }) => {
   );
 };
 
+const MenuTableSkeleton = () => (
+  <div className="admin-table-wrap">
+    <table className="admin-table">
+      <thead>
+        <tr>
+          <th>Food Item</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Availability</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 5 }).map((_, idx) => (
+          <tr key={idx}>
+            <td>
+              <div className="skeleton-line" style={{ width: '55%', height: 16 }} />
+              <div className="skeleton-line" style={{ width: '75%', height: 12, marginTop: 4 }} />
+            </td>
+            <td><div className="skeleton-line" style={{ width: '40%', height: 20, borderRadius: 'var(--radius-full)' }} /></td>
+            <td><div className="skeleton-line" style={{ width: '30%', height: 16 }} /></td>
+            <td><div className="skeleton-line" style={{ width: '35%', height: 20, borderRadius: 'var(--radius-full)' }} /></td>
+            <td><div className="skeleton-line" style={{ width: '25%', height: 24 }} /></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
 const AdminMenuPage = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,7 +151,9 @@ const AdminMenuPage = () => {
       )}
       {confirmDelete && (
         <ConfirmDialog
-          message="Are you sure you want to delete this menu item? It will be removed from student menu."
+          title="Delete Menu Item"
+          message="Are you sure you want to delete this menu item? It will be removed from the student menu."
+          confirmText="Delete Item"
           onConfirm={handleDelete}
           onCancel={() => setConfirmDelete(null)}
         />
@@ -140,7 +172,7 @@ const AdminMenuPage = () => {
           </div>
 
           {loading ? (
-            <div className="loading-box"><div className="spinner" /></div>
+            <MenuTableSkeleton />
           ) : items.length === 0 ? (
             <div className="empty-state">
               <Utensils size={40} style={{ color: 'var(--grey-text)', margin: '0 auto 12px' }} />

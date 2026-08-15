@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock, QrCode, Check } from 'lucide-react';
+import { LayoutDashboard, ClipboardList, Search, ChefHat, CheckCircle2, Clock, QrCode, Check, User } from 'lucide-react';
 import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import CancellationReasonModal from '../../components/CancellationReasonModal';
@@ -9,6 +9,7 @@ import { fetchStaffStats, fetchAllOrders, updateOrderStatus, verifyOrderPayment,
 const SIDEBAR_LINKS = [
   { to: '/staff', label: 'Dashboard', icon: <LayoutDashboard size={16} />, end: true },
   { to: '/staff/orders', label: 'All Orders', icon: <ClipboardList size={16} /> },
+  { to: '/profile', label: 'Profile', icon: <User size={16} /> },
 ];
 
 const StatusBadge = ({ status }) => (
@@ -18,39 +19,43 @@ const StatusBadge = ({ status }) => (
 const OrderCard = ({ order, onStatusChange }) => {
   const [loading, setLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cardError, setCardError] = useState('');
 
   const handleUpdate = async (newStatus) => {
+    setCardError('');
     setLoading(true);
     try {
       await updateOrderStatus(order._id, newStatus);
       onStatusChange();
     } catch {
-      alert('Failed to update status');
+      setCardError('Failed to update status');
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyPayment = async () => {
+    setCardError('');
     setLoading(true);
     try {
       await verifyOrderPayment(order._id);
       onStatusChange();
     } catch {
-      alert('Failed to verify payment');
+      setCardError('Failed to verify payment');
     } finally {
       setLoading(false);
     }
   };
 
   const handleStaffCancelConfirm = async (reason, customReason) => {
+    setCardError('');
     const finalReason = customReason || reason;
     try {
       await staffCancelOrder(order._id, finalReason);
       setShowCancelModal(false);
       onStatusChange();
     } catch {
-      alert('Failed to cancel order');
+      setCardError('Failed to cancel order');
     }
   };
 
@@ -83,6 +88,11 @@ const OrderCard = ({ order, onStatusChange }) => {
         </div>
       </div>
 
+      {cardError && (
+        <p className="form-error" style={{ fontSize: '0.8rem', marginTop: 8, marginBottom: 0 }}>
+          {cardError}
+        </p>
+      )}
       <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap' }}>
         {order.status === 'Pending' && (
           <>
@@ -130,6 +140,30 @@ const OrderCard = ({ order, onStatusChange }) => {
     </div>
   );
 };
+
+const StaffOrderSkeleton = () => (
+  <div className="order-list">
+    {Array.from({ length: 3 }).map((_, idx) => (
+      <div key={idx} className="skeleton-card" style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '60%' }}>
+            <div className="skeleton-line" style={{ width: '40%', height: 18 }} />
+            <div className="skeleton-line" style={{ width: '80%', height: 14 }} />
+            <div className="skeleton-line" style={{ width: '100%', height: 14 }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, width: '20%' }}>
+            <div className="skeleton-line" style={{ width: '70%', height: 18 }} />
+            <div className="skeleton-line" style={{ width: '50%', height: 12 }} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)' }}>
+          <div className="skeleton-line" style={{ width: '30%', height: 32, borderRadius: 'var(--radius-sm)' }} />
+          <div className="skeleton-line" style={{ width: '30%', height: 32, borderRadius: 'var(--radius-sm)' }} />
+        </div>
+      </div>
+    ))}
+  </div>
+);
 
 const StaffDashboard = () => {
   const [stats, setStats] = useState({ pending: 0, preparing: 0, completedToday: 0 });
@@ -236,7 +270,7 @@ const StaffDashboard = () => {
           </div>
 
           {loading ? (
-            <div className="loading-box"><div className="spinner" /></div>
+            <StaffOrderSkeleton />
           ) : orders.length === 0 ? (
             <div className="empty-state">
               <p>📋</p>

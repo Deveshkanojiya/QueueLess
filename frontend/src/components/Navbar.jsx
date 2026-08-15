@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, LogOut, UtensilsCrossed, Menu, X, LayoutDashboard, ShoppingBag, Users } from 'lucide-react';
+import { ShoppingCart, LogOut, UtensilsCrossed, Menu, X, LayoutDashboard, ShoppingBag, Users, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const Navbar = ({ onCartOpen }) => {
@@ -52,6 +52,9 @@ const Navbar = ({ onCartOpen }) => {
                 <Link to="/admin/users" className="btn btn-ghost btn-sm">Staff & Users</Link>
                 <Link to="/admin/orders" className="btn btn-ghost btn-sm">Orders</Link>
               </>
+            )}
+            {user && (
+              <Link to="/profile" className="btn btn-ghost btn-sm">Profile</Link>
             )}
           </nav>
 
@@ -195,6 +198,15 @@ const Navbar = ({ onCartOpen }) => {
                   <span>Orders</span>
                 </Link>
               </>
+            {user && (
+              <Link
+                to="/profile"
+                className={location.pathname === '/profile' ? 'active' : ''}
+                onClick={closeMobileMenu}
+              >
+                <User size={16} />
+                <span>Profile</span>
+              </Link>
             )}
           </div>
 

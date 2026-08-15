@@ -13,21 +13,25 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
   const [selectedReason, setSelectedReason] = useState('');
   const [customReason, setCustomReason] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleConfirm = async () => {
+    setError('');
     if (!selectedReason) {
-      alert('Please select a cancellation reason');
+      setError('Please select a cancellation reason');
       return;
     }
 
     if (selectedReason === 'Other') {
       if (!customReason.trim()) {
-        alert('Please enter a custom reason for "Other"');
+        setError('Please enter a custom reason');
         return;
       }
       setLoading(true);
       try {
         await onConfirm(selectedReason, customReason.trim());
+      } catch (err) {
+        setError('Failed to cancel order');
       } finally {
         setLoading(false);
       }
@@ -35,6 +39,8 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
       setLoading(true);
       try {
         await onConfirm(selectedReason, null);
+      } catch (err) {
+        setError('Failed to cancel order');
       } finally {
         setLoading(false);
       }
@@ -92,6 +98,7 @@ const CancellationReasonModal = ({ onConfirm, onCancel }) => {
           </div>
         )}
 
+        {error && <p className="form-error" style={{ marginBottom: 12 }}>{error}</p>}
         <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
           <button
             className="btn btn-outline"
