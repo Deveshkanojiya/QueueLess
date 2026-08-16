@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import CancellationReasonModal from '../../components/CancellationReasonModal';
 import OpenOrderModal from '../../components/OpenOrderModal';
+import { formatOrderDate, formatOrderTime } from '../../utils/date';
 import { fetchStaffStats, fetchAllOrders, updateOrderStatus, verifyOrderPayment, staffCancelOrder } from '../../api/staff';
 
 const SIDEBAR_LINKS = [
@@ -83,7 +84,7 @@ const OrderCard = ({ order, onStatusChange }) => {
         <div style={{ textAlign: 'right' }}>
           <p style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--red)' }}>₹{order.totalPrice}</p>
           <p style={{ fontSize: '0.75rem', color: 'var(--grey-text)', marginTop: 4 }}>
-            {new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {formatOrderDate(order.createdAt)} at {formatOrderTime(order.createdAt)}
           </p>
         </div>
       </div>

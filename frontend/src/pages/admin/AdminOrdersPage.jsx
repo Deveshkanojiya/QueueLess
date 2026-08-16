@@ -4,6 +4,7 @@ import Navbar from '../../components/Navbar';
 import Sidebar from '../../components/Sidebar';
 import { ADMIN_LINKS } from './AdminDashboard';
 import { fetchAdminOrders } from '../../api/admin';
+import { formatOrderDateTime } from '../../utils/date';
 
 const OrdersTableSkeleton = () => (
   <div className="admin-table-wrap">
@@ -128,7 +129,7 @@ const AdminOrdersPage = () => {
                       <td style={{ fontSize: '0.8125rem' }}>{o.paymentMethod}</td>
                       <td><span className={`status-badge status-${o.status}`}>{o.status}</span></td>
                       <td style={{ fontSize: '0.75rem', color: 'var(--grey-text)', whiteSpace: 'nowrap' }}>
-                        {new Date(o.createdAt).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                        {formatOrderDateTime(o.createdAt)}
                       </td>
                     </tr>
                   ))}

@@ -6,6 +6,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import ViewQrModal from '../components/ViewQrModal';
 import { fetchMyOrders, cancelOrder } from '../api/orders';
 import OrderDetailsModal, { getEstimatedWaitDisplay } from '../components/OrderDetailsModal';
+import { formatOrderDateTime } from '../utils/date';
 
 // Stage index mapping for live status tracking
 const STATUS_STAGES = {
@@ -331,7 +332,7 @@ const OrderHistoryPage = () => {
                         {/* Cancel Button (Only if Pending) */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap', gap: 8 }}>
                           <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
-                            Placed on {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                            Placed on {formatOrderDateTime(order.createdAt)}
                           </p>
                           <div style={{ display: 'flex', gap: 8 }}>
                             <button
@@ -415,7 +416,7 @@ const OrderHistoryPage = () => {
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12, paddingTop: 10, borderTop: '1px solid var(--grey-border)', flexWrap: 'wrap', gap: 8 }}>
                         <p style={{ fontSize: '0.78rem', color: 'var(--grey-text)' }}>
-                          {new Date(order.createdAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                          {formatOrderDateTime(order.createdAt)}
                         </p>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                           <button

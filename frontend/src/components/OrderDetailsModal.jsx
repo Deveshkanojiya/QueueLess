@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Calendar, Clock, CreditCard, Tag, CheckCircle2, AlertCircle } from 'lucide-react';
+import { formatOrderDate, formatOrderTime } from '../utils/date';
 
 const getEstimatedWaitDisplay = (order) => {
   if (!order) return '';
@@ -31,20 +32,11 @@ const OrderDetailsModal = ({ order, onClose }) => {
   if (!order) return null;
 
   const isActive = ['Pending', 'Accepted', 'Preparing', 'Ready'].includes(order.status);
-  const formattedDate = new Date(order.createdAt).toLocaleDateString(undefined, {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-  
-  const formattedTime = new Date(order.createdAt).toLocaleTimeString(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const formattedDate = formatOrderDate(order.createdAt);
+  const formattedTime = formatOrderTime(order.createdAt);
 
   const completedTime = order.status === 'Completed' 
-    ? new Date(order.updatedAt).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+    ? formatOrderTime(order.updatedAt)
     : null;
 
   // Timeline statuses helper
