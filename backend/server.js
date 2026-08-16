@@ -12,7 +12,6 @@ const { seedMenuItems } = require('./controllers/menuController');
 dotenv.config();
 
 const app = express();
-
 // Connect to MongoDB and seed menu if empty
 connectDB().then(() => seedMenuItems());
 
