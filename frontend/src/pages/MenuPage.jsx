@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ShoppingCart, Search, Utensils, Star, Flame } from 'lucide-react';
+import { ShoppingCart, Search, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CartDrawer from '../components/CartDrawer';
 import { useCart } from '../context/CartContext';

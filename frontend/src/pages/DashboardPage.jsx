@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { UtensilsCrossed, ShoppingBag, Clock, LayoutDashboard, QrCode, Eye, Download, User } from 'lucide-react';
+import { UtensilsCrossed, ShoppingBag, Clock, LayoutDashboard, QrCode, User } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Sidebar from '../components/Sidebar';
 import { fetchMyOrders } from '../api/orders';
