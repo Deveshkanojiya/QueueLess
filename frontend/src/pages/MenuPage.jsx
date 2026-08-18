@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ShoppingCart, Search, Star } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import CartDrawer from '../components/CartDrawer';
@@ -27,6 +27,88 @@ const getFoodImage = (item) => {
   }
 };
 
+const FoodCard = ({ item, isPopular }) => {
+  const { cart, addToCart, increaseQty, decreaseQty } = useCart();
+  const cartItem = cart.find((i) => i._id === item._id);
+  const qty = cartItem ? cartItem.quantity : 0;
+  const prevQty = useRef(qty);
+  const addBtnRef = useRef(null);
+  const minusBtnRef = useRef(null);
+
+  useEffect(() => {
+    if (qty > 0 && prevQty.current === 0) {
+      minusBtnRef.current?.focus();
+    } else if (qty === 0 && prevQty.current > 0) {
+      addBtnRef.current?.focus();
+    }
+    prevQty.current = qty;
+  }, [qty]);
+
+  return (
+    <div className="food-card">
+      <div className="food-card-img">
+        <img
+          src={getFoodImage(item) || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}
+          alt={item.name}
+          loading="lazy"
+        />
+        {isPopular && (
+          <span className="food-popular-badge">
+            <Star size={11} fill="currentColor" /> Popular
+          </span>
+        )}
+        {!item.available && <span className="food-unavailable-badge">Out of Stock</span>}
+      </div>
+
+      <div className="food-card-body">
+        <span className="category-tag">{item.category}</span>
+        <h3>{item.name}</h3>
+        <p className="desc">{item.description}</p>
+      </div>
+
+      <div className="food-card-footer">
+        <span className="food-price">₹{item.price}</span>
+        <div className="food-add-actions">
+          {!item.available || qty === 0 ? (
+            <button
+              ref={addBtnRef}
+              className="btn btn-primary btn-sm food-add-btn"
+              onClick={() => addToCart(item)}
+              disabled={!item.available}
+              aria-label={`Add ${item.name} to cart`}
+            >
+              <ShoppingCart size={14} />
+              <span>{item.available ? 'Add' : 'Out of Stock'}</span>
+            </button>
+          ) : (
+            <div className="qty-selector" role="group" aria-label={`Quantity selector for ${item.name}`}>
+              <button
+                ref={minusBtnRef}
+                className="qty-selector-btn"
+                onClick={() => decreaseQty(item._id)}
+                aria-label={`Decrease quantity of ${item.name}`}
+              >
+                −
+              </button>
+              <span key={qty} className="qty-selector-num" aria-live="polite">
+                {qty}
+              </span>
+              <button
+                className="qty-selector-btn"
+                onClick={() => increaseQty(item._id)}
+                disabled={qty >= 99}
+                aria-label={`Increase quantity of ${item.name}`}
+              >
+                +
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MenuSkeleton = () => (
   <div className="food-grid">
     {Array.from({ length: 6 }).map((_, idx) => (
@@ -52,7 +134,6 @@ const MenuPage = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [cartOpen, setCartOpen] = useState(false);
-  const { addToCart } = useCart();
 
   useEffect(() => {
     fetchMenu()
@@ -131,42 +212,7 @@ const MenuPage = () => {
                   item.isPopular ||
                   POPULAR_NAMES.includes(item.name.toLowerCase());
 
-                return (
-                  <div key={item._id} className="food-card">
-                    <div className="food-card-img">
-                      <img
-                        src={getFoodImage(item) || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500'}
-                        alt={item.name}
-                        loading="lazy"
-                      />
-                      {isPopular && (
-                        <span className="food-popular-badge">
-                          <Star size={11} fill="currentColor" /> Popular
-                        </span>
-                      )}
-                      {!item.available && <span className="food-unavailable-badge">Out of Stock</span>}
-                    </div>
-
-                    <div className="food-card-body">
-                      <span className="category-tag">{item.category}</span>
-                      <h3>{item.name}</h3>
-                      <p className="desc">{item.description}</p>
-                    </div>
-
-                    <div className="food-card-footer">
-                      <span className="food-price">₹{item.price}</span>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => addToCart(item)}
-                        disabled={!item.available}
-                        aria-label={`Add ${item.name} to cart`}
-                      >
-                        <ShoppingCart size={14} />
-                        <span>{item.available ? 'Add' : 'Out of Stock'}</span>
-                      </button>
-                    </div>
-                  </div>
-                );
+                return <FoodCard key={item._id} item={item} isPopular={isPopular} />;
               })}
             </div>
           )}
